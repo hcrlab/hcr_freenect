@@ -1,0 +1,23 @@
+<launch>
+  <arg name="kinect_frame_prefix" default="/head_mount_kinect" />
+  <arg name="kinect_camera_name" default="head_mount_kinect" />
+  <arg name="debug_shelf" default="false" /> <!-- Set to true to not run the shelf localization node in this launch file. -->
+  <arg name="debug_crop" default="false" /> <!-- Set to true to not run the shelf cropping node in this launch file. -->
+  <arg name="debug_segmentation" default="false" /> <!-- Set to true to not run the item segmentation node in this launch file. -->
+  <arg name="debug_openni" default="false" /> <!-- Set to true to not run openni in this launch file. -->
+  <arg name="alternate_kinect_frames" default="false" />
+
+  <!-- Turn on the Kinect -->
+  <include file="$(find freenect_launch)/launch/freenect.launch" unless="$(arg debug_openni)">
+    <arg name="depth_registration" value="true"/>
+    <arg name="camera" value="head_mount_kinect"/>
+    <arg unless="$(arg alternate_kinect_frames)" name="rgb_frame_id" value="$(arg kinect_frame_prefix)_rgb_optical_frame"/>
+    <arg unless="$(arg alternate_kinect_frames)" name="depth_frame_id" value="$(arg kinect_frame_prefix)_depth_optical_frame"/>
+    <arg if="$(arg alternate_kinect_frames)" name="rgb_frame_id" value="$(arg kinect_frame_prefix)_tuned_rgb_optical_frame"/>
+    <arg if="$(arg alternate_kinect_frames)" name="depth_frame_id" value="$(arg kinect_frame_prefix)_tuned_ir_optical_frame"/>
+    <arg name="publish_tf" value="false"/> <!-- We publish the tf ourselves with kinect_frame.launch -->
+  </include>
+  <include file="$(find hcr_freenect)/launch/kinect_frames.launch">
+    <arg name="camera" value="head_mount_kinect" />
+  </include>
+</launch>
